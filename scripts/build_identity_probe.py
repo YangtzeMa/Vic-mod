@@ -21,7 +21,7 @@ BUTTON = '''
             size = { 130 30 }
             text = "vicmod_identify_click"
             tooltip = "vicmod_identify_tooltip"
-            visible = "[AchievementWindow.HasGameStarted]"
+            visible = "[And(AchievementWindow.HasGameStarted, AchievementWindow.ShouldShowAll)]"
             enabled = "[And(AchievementWindow.ShouldShowAll, GUIAchievement.GetAchievement.IsUnlocked)]"
             onclick = "[GetVariableSystem.Set('vicmod_click_all', Select_CString(AchievementWindow.ShouldShowAll, '1', '0'))]"
             onclick = "[GetVariableSystem.Set('vicmod_click_unlocked', Select_CString(GUIAchievement.GetAchievement.IsUnlocked, '1', '0'))]"
@@ -64,8 +64,8 @@ def build(game: Path, output: Path):
     }
 ''')
     for language, label, tooltip in [
-        ('simp_chinese', '识别此成就', '请在“全部”页点击已解锁成就。按原版分组和条目位置识别；筛选页停用以避免位置变化造成误认。'),
-        ('english', 'Identify achievement', 'Use All and choose an unlocked achievement. Filtered lists are disabled to avoid shifted coordinates.')
+        ('simp_chinese', '识别此成就', '在“全部”页点击已解锁成就以记录其身份。'),
+        ('english', 'Identify achievement', 'Identify an unlocked achievement from the All list.')
     ]:
         write(f'localization/{language}/vicmod_capture_probe_l_{language}.yml',
               f'l_{language}:\n vicmod_identify_click:0 "{label}"\n vicmod_identify_tooltip:0 "{tooltip}"\n'
@@ -76,7 +76,7 @@ def build(game: Path, output: Path):
     write('.metadata/metadata.json', json.dumps({
         'name': 'Vic Mod Memory - Capture Probe',
         'id': 'com.github.YangtzeMa.Vic-mod.capture-probe',
-        'version': '0.0.5', 'game_id': 'victoria3',
+        'version': '0.0.6', 'game_id': 'victoria3',
         'supported_game_version': '1.15.*',
         'short_description': 'Native list identity probe; All filter only; no OCR, no automatic record writes.',
         'tags': ['Utilities'], 'relationships': [],
@@ -90,4 +90,4 @@ if __name__ == '__main__':
     parser.add_argument('--game', type=Path, required=True)
     args = parser.parse_args()
     build(args.game, ROOT / '.local/memory-probe')
-    print('Generated identity probe 0.0.5: one button per row; native All-list coordinates; no background process.')
+    print('Generated identity probe 0.0.6: identification buttons visible only in All; no background process.')
