@@ -12,8 +12,13 @@ def read_records(path: Path):
     if not path.exists():
         return {'version': 1, 'completed': {}, 'diagnostics': [], 'unresolved': []}
     data = json.loads(path.read_text('utf-8'))
-    if data.get('version') != 1 or not isinstance(data.get('completed'), dict):
+    if (not isinstance(data, dict) or data.get('version') != 1
+            or not isinstance(data.get('completed'), dict)
+            or not isinstance(data.get('diagnostics', []), list)
+            or not isinstance(data.get('unresolved', []), list)):
         raise ValueError('Unsupported or damaged record file; refusing to overwrite it')
+    data.setdefault('diagnostics', [])
+    data.setdefault('unresolved', [])
     return data
 
 
@@ -73,3 +78,31 @@ def consume(path: Path, lines, catalog):
     if changed:
         save_records(path, data)
     return data
+
+
+def remember_clicks(path: Path, lines, groups):
+    """Persist only identity packets accepted by the verified-coordinate parser."""
+    from identity import PREFIX, resolve_click
+    data = read_records(path)
+    added, rejected = [], []
+    for line in lines:
+        if PREFIX not in line:
+            continue
+        try:
+            click = resolve_click(line, groups)
+        except ValueError as error:
+            message = 'identity:' + str(error)
+            rejected.append(message)
+            if message not in data['unresolved']:
+                data['unresolved'].append(message)
+            continue
+        key = click['id']
+        if key not in data['completed']:
+            data['completed'][key] = {
+                'observed_at': datetime.now(timezone.utc).isoformat(),
+                'source': 'native_achievement_button', 'title': key,
+            }
+            added.append(key)
+    if added or data != read_records(path):
+        save_records(path, data)
+    return data, {'added': added, 'rejected': rejected}
