@@ -24,6 +24,16 @@ git diff --cached --check
 
 不要把静态 CI 通过当作游戏运行证据。纯文档变更完成文档检查即可；后续修改游戏加载内容时应重做相应运行测试。
 
+## 成就按钮身份盲测（实验 0.0.5）
+
+使用 `python scripts/build_identity_probe.py --game <installed-game-directory>` 更新本地实验目录；失败的旧记忆生成器保持禁用。普通启动 1.15.0（Steam build 26453692），播放集只启用本项目 Capture Probe，不使用调试或成就解锁命令。
+
+进入战役，在成就窗口选“全部”。任选两到三个不同的已解锁成就点击“识别此成就”，最好包括同一组内不同位置及不同组；先由开发者读日志报出点击顺序，再由用户核对，不预先提供成就名称。未解锁及筛选页按钮应禁用。正常退出以刷新日志，不覆盖已有存档。
+
+开发者执行 `python -X utf8 companion/read_identity_clicks.py --game <installed-game-directory> --logs <user-log-directory>`。读取器只检查最新会话，按原版 `common/achievement_groups.txt` 解析位置，并校验完整分组覆盖、重复 ID、对应表指纹、All/已解锁状态、组数与组内数量、坐标范围。任何失败都报告 rejected，不猜测或写记录。还需核对当前 error.log 中对应接口错误。离线对所有坐标枚举只能证明映射算法，不证明游戏实际返回索引正确。
+
+此实验不支持在“已解锁”或“可完成”筛选页直接识别，因为筛选会改变行索引。尚未恢复记忆面板、自动捕获和跨重启保存，也不使用 OCR；这些不能随按钮识别一起标为通过。
+
 ## GitHub 同步
 
 用户已授权每次检查及必要测试通过后及时 commit/push。同步前检查 diff 和待提交文件；同步后确认本地 HEAD 与远端 HEAD 相同，并检查该提交的 CI。禁止 force-push，禁止提交本机凭据和原版资源。
