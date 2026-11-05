@@ -23,6 +23,7 @@
 - A new preview image must be visually inspected. Regeneration uses `scripts/make_thumbnail.py` and Pillow; other scripts use only the Python standard library.
 - Changes to game-loaded metadata, art or content need relevant in-game checks before being called tested. Pure documentation changes need document/link review.
 - Record exact game build, test scope and observed results in `docs/validation.md`. Do not manufacture evidence or turn a pending check into a pass.
+- Prefer user-assisted manual game checks. When the user confirms the same build and unchanged game-loaded files passed, record that evidence and continue; do not repeat Computer Use playtesting unnecessarily.
 - Do not add tests that merely repeat a low-impact implementation; keep the existing package-boundary checks meaningful.
 
 ## GitHub synchronization (already authorized by the user)

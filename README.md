@@ -2,6 +2,8 @@
 
 Victoria 3 Mod 开发框架，目标游戏版本 **1.15.x**，当前 Mod 版本 **0.1.0**。
 
+[GitHub 仓库](https://github.com/YangtzeMa/Vic-mod) · [自动检查与构建产物](https://github.com/YangtzeMa/Vic-mod/actions/workflows/validate.yml)
+
 当前仅包含 Mod 元数据与原创占位封面，**没有事件、决议、数值修改或其他玩法代码**。后续功能按实际需求逐项添加。
 
 已在 **1.15.0** 完成用户手动加载、成就资格与短时运行检查，并通过本地静态及打包检查。[验证记录](docs/validation.md)

@@ -21,8 +21,8 @@
 | 封面视觉检查 | 通过 | 1024×1024 原创占位封面显示正常 |
 | 本地链接和 Launcher 注册 | 通过 | 目录联接与重复运行检查通过；Launcher 名称、封面显示正常；用户确认已在播放集中启用 |
 | 正常启动与成就界面 | 通过（用户手动） | 用户确认正常启动、新开局、成就资格及推进数日均通过；本次不是实际解锁某项成就的测试 |
-| GitHub 上传 | 待执行 | 核对远端 HEAD |
-| GitHub CI | 待执行 | 核对上传提交的 Actions |
+| GitHub 上传 | 通过 | 私有仓库 `YangtzeMa/Vic-mod` 已创建；首次上传后本地与远端 `main` 提交一致 |
+| GitHub CI | 通过 | [首次运行](https://github.com/YangtzeMa/Vic-mod/actions/runs/42041426273)的元数据/封面检查、打包和构建产物上传均通过 |
 
 待执行项目不能作为已经通过的结论。实际日志、机器路径和截图保存在忽略的 `.local/` 中；本文仅记录可核实的简洁结果。
 
@@ -37,3 +37,10 @@
 本次 `error.log` 并非空文件：389 条记录中，374 条为游戏路径的纹理缺失，15 条为游戏建筑本地化 key 缺失；没有匹配到本项目名称、路径或前缀的条目。本模板也没有打包任何对应资源或脚本覆盖。未进行无 Mod 对照，不据此声称全部日志错误已被修复或已确定来源。
 
 本次使用用户创建并启用的播放集，未更改用户原版游戏文件、已有存档或成就机制。测试后的播放集选择由用户保留。
+
+## 交付与后续同步
+
+- 仓库：[YangtzeMa/Vic-mod](https://github.com/YangtzeMa/Vic-mod)，可见性为私有，默认分支为 `main`。
+- 自动检查：[Validate and package](https://github.com/YangtzeMa/Vic-mod/actions/workflows/validate.yml)。每次推送及 Pull Request 自动运行，并提供 `vic-mod-package` 构建产物。
+- 已配置本地 `origin/main` 跟踪与推送前检查。后续更改按 `AGENTS.md` 完成必要检查后及时提交和推送。
+- 当前只准备 Workshop 上传目录与包；没有创建创意工坊条目。
