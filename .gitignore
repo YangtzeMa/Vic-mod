@@ -1,0 +1,28 @@
+# Machine-specific configuration and local evidence
+.local/
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+
+# Generated packages, Python caches, temporary files
+dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.tmp
+*.bak
+Thumbs.db
+.DS_Store
+
+# Game / Launcher data never belongs in the repository
+*.v3
+*.log
+*.sqlite
+*.sqlite-*
+logs/
+save games/
+crashes/
+dumps/

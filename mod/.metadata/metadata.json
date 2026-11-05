@@ -1,0 +1,14 @@
+{
+  "name": "Vic Mod Template",
+  "id": "com.github.YangtzeMa.Vic-mod",
+  "version": "0.1.0",
+  "game_id": "victoria3",
+  "picture": "thumbnail.png",
+  "supported_game_version": "1.15.*",
+  "short_description": "A clean Victoria 3 mod framework. No gameplay changes.",
+  "tags": ["Utilities"],
+  "relationships": [],
+  "game_custom_data": {
+    "multiplayer_synchronized": true
+  }
+}

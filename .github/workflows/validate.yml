@@ -1,0 +1,29 @@
+name: Validate and package
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  framework:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Check whitespace
+        run: git show --format= --check HEAD
+      - name: Validate framework
+        run: python scripts/validate_mod.py
+      - name: Build game-loadable package
+        run: python scripts/package_mod.py
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: vic-mod-package
+          path: dist/*
+          if-no-files-found: error
