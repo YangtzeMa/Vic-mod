@@ -8,7 +8,7 @@ import re
 import sys
 import time
 
-from identity import PREFIX, read_order
+from identity import PREFIX, BULK_PREFIX, read_order
 from memory import remember_clicks
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,16 +24,19 @@ def click_lines(logs):
     for path in sorted(files, key=rotation, reverse=True):
         try:
             for line in path.read_text('utf-8-sig', errors='replace').splitlines():
-                if PREFIX in line:
+                if PREFIX in line or BULK_PREFIX in line:
                     yield line
         except (FileNotFoundError, PermissionError):
             continue
 
 
-def synchronize(game, user, output):
+def synchronize(game, user, output, release=False):
     records = user / 'vicmod_achievement_memory/records.json'
     data, report = remember_clicks(records, click_lines(user / 'logs'), read_order(game))
-    result = build(game, output, data['completed'])
+    result = build(game, output, data['completed'], public=release)
+    if release:
+        from release_metadata import configure
+        configure(output)
     return dict(result, added=report['added'], rejected=report['rejected'])
 
 
@@ -106,6 +109,7 @@ def main():
     parser.add_argument('--user', type=Path)
     parser.add_argument('--output', type=Path, default=ROOT / '.local/memory-probe')
     parser.add_argument('--once', action='store_true')
+    parser.add_argument('--release', action='store_true', help='Keep the stable public mod identity')
     args = parser.parse_args()
     process = GameProcess()
     user = args.user or documents() / 'Paradox Interactive/Victoria 3'
@@ -132,7 +136,7 @@ def main():
                 # if a new instance was already launched in the meantime.
                 if process.find():
                     continue
-            report = synchronize(args.game, user, args.output)
+            report = synchronize(args.game, user, args.output, release=args.release)
             print('MEMORY_READY ' + json.dumps(report, ensure_ascii=False), flush=True)
             if args.once:
                 return

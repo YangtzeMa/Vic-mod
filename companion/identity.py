@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 
 PREFIX = 'VICMOD_CLICK_V1|'
+BULK_PREFIX = 'VICMOD_BULK_V1|'
 IDENTIFIER = re.compile(r'[A-Za-z0-9_]+\Z')
 
 
@@ -82,3 +83,30 @@ def resolve_click(line, groups):
     if count != len(group['ids']) or row >= count:
         raise ValueError('Native achievement count or index differs from installed order')
     return {'id': group['ids'][row], 'group': group['name'], 'group_index': group_index, 'row_index': row}
+
+
+def resolve_bulk(line, groups):
+    if BULK_PREFIX not in line:
+        return None
+    fields = {}
+    for pair in line.split(BULK_PREFIX, 1)[1].strip().split('|'):
+        key, separator, value = pair.partition('=')
+        if not separator or key in fields:
+            raise ValueError('Malformed bulk packet')
+        fields[key] = value
+    if set(fields) != {'table', 'all', 'groups', 'group', 'count', 'bits'}:
+        raise ValueError('Incomplete bulk packet')
+    if fields['table'] != fingerprint(groups) or fields['all'] != '1':
+        raise ValueError('Bulk packet has stale order or filtered coordinates')
+    if any(not re.fullmatch(r'0|[1-9][0-9]*', fields[key]) for key in ('groups', 'group', 'count')):
+        raise ValueError('Invalid bulk group coordinate')
+    index = int(fields['group'])
+    if int(fields['groups']) != len(groups) or index >= len(groups):
+        raise ValueError('Bulk group count differs')
+    group = groups[index]
+    if int(fields['count']) != len(group['ids']) or len(fields['bits']) != len(group['ids']):
+        raise ValueError('Bulk snapshot is incomplete')
+    if not re.fullmatch('[01]+', fields['bits']):
+        raise ValueError('Bulk snapshot has missing or invalid unlock states')
+    return [{'id': key, 'group': group['name'], 'group_index': index, 'row_index': row}
+            for row, (key, bit) in enumerate(zip(group['ids'], fields['bits'])) if bit == '1']

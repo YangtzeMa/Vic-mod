@@ -1,5 +1,7 @@
 # 成就按钮身份识别检查点
 
+0.0.8已获用户个人验收，现可用 `python scripts/package_release.py` 制作干净的 Windows 源码安装ZIP。发行使用方式见 [安装说明](../distribution/README_release.md)，其中 INSTALL.cmd 和 START.cmd 在ZIP根目录。此包需要Python3.12+，不包含用户快照或原版GUI；安装时在收件人本机生成完整mod/。以下内容保留各阶段识别检查点的验证范围。
+
 0.0.7在此已验证的坐标链路上增加会话记忆列表和退出后保存。用户已试用并给予良好反馈，日志确认新增记录在游戏退出后保存、快照更新，助手在下一次启动继续运行。测试入口为 `companion/run_memory.py`；详细证据和未单独确认的显示检查见 [validation.md](validation.md) 与 [testing.md](testing.md#本地记忆与显示测试实验-007)。以下内容描述此前0.0.5/0.0.6识别检查点。
 
 当前可用入口是 `scripts/build_identity_probe.py` 与 `companion/read_identity_clicks.py`。目标 Victoria 3 1.15.0（Steam build 26453692）。这仍是开发实验：正式 `mod/` 保留空框架，生成的 Capture Probe 在忽略的 `.local/memory-probe/`，不提交原版 GUI 内容。

@@ -24,6 +24,8 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Build game-loadable package
         run: python scripts/package_mod.py
+      - name: Build achievement memory source release
+        run: python scripts/package_release.py
       - uses: actions/upload-artifact@v7.0.2
         with:
           name: vic-mod-package

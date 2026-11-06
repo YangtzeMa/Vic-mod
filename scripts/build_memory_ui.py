@@ -63,7 +63,7 @@ def remembered_body(source, game, key):
     return body
 
 
-def build(game: Path, output: Path, completed=()):
+def build(game: Path, output: Path, completed=(), public=False):
     groups = read_order(game)
     saved = set(completed)
     valid = {key for group in groups for key in group['ids']}
@@ -163,7 +163,7 @@ def build(game: Path, output: Path, completed=()):
     window = window.replace(anchor, entry + anchor, 1)
     window = window.replace(outer, panel + '\n' + outer +
                             '\n            visible = "[Not(GetVariableSystem.Exists(\'vicmod_memory_open\'))]"', 1)
-    build_identity(game, output)
+    build_identity(game, output, public=public)
     path = output / 'gui/achievements/jomini_achievements_types.gui'
     types = path.read_text('utf-8-sig')
     execute = '            onclick = "[GetScriptedGui(\'vicmod_identify_click\').Execute(GuiScope.SetRoot(GetPlayer.MakeScope).End)]"'
@@ -172,7 +172,10 @@ def build(game: Path, output: Path, completed=()):
     hooks = (
         f'            onclick = "[GetVariableSystem.Set(Concatenate4(\'{row_prefix}\', GetVariableSystem.Get(\'vicmod_click_group\'), \'_\', GetVariableSystem.Get(\'vicmod_click_row\')), \'1\')]"\n'
         f'            onclick = "[GetVariableSystem.Set(Concatenate(\'{group_prefix}\', GetVariableSystem.Get(\'vicmod_click_group\')), \'1\')]"\n')
-    path.write_text(types.replace(execute, hooks + execute), encoding='utf-8-sig')
+    from memory_controls import upgrade
+    types, window, sguis, bulk_loc = upgrade(types.replace(execute, hooks + execute), window, groups, table, body_of)
+    path.write_text(types, encoding='utf-8-sig')
+    (output / 'common/scripted_guis/vicmod_capture_probe.txt').write_text(sguis, encoding='utf-8-sig')
     (output / 'gui/achievements/jomini_achievements_window.gui').write_text(window, encoding='utf-8-sig')
     for language, labels in {
         'simp_chinese': ('记住此成就', '我的成就 · 本地记忆', '这里只显示本机记住的成就。新标记立即显示；保持本地助手运行，以便退出游戏时保存。', '暂无本地记忆。请返回原版“全部”页，对已解锁成就点击“记住此成就”。', '返回原版成就'),
@@ -184,10 +187,12 @@ def build(game: Path, output: Path, completed=()):
         text = text.replace(f'vicmod_identify_click:0 "{old}"', f'vicmod_identify_click:0 "{labels[0]}"')
         text += '\n'.join(f' {key}:0 "{value}"' for key, value in zip(
             ['vicmod_memory_title', 'vicmod_memory_note', 'vicmod_memory_empty', 'vicmod_memory_back'], labels[1:])) + '\n'
+        text += bulk_loc
+        text += ' vicmod_bulk_remember:0 "' + ('一键记忆当前可记忆成就' if language == 'simp_chinese' else 'Remember all eligible achievements') + '"\n'
         loc.write_text(text, encoding='utf-8-sig')
     metadata = output / '.metadata/metadata.json'
     data = json.loads(metadata.read_text('utf-8'))
-    data['version'] = '0.0.7'
+    data['version'] = '0.0.8'
     data['short_description'] = 'Local achievement memory test: native rows, immediate session display, helper persistence on exit.'
     metadata.write_text(json.dumps(data, indent=2), encoding='utf-8')
     return {'saved': len(saved), 'rows': len(valid), 'table': table}

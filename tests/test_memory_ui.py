@@ -103,6 +103,9 @@ class MemoryIntegrationTests(unittest.TestCase):
             self.assertIn(f"vicmod_seen_{fingerprint(groups)}_1_1", window)
             self.assertEqual(1, types.count('text = "vicmod_identify_click"'))
             self.assertIn('Concatenate4(', types)
+            self.assertNotIn('GetPlayer', types)
+            self.assertIn('PdxGuiTriggerAllAnimations', window)
+            self.assertIn('vicmod_remember_row', types)
             self.assertEqual((game / 'gui/achievements/popup.gui').read_bytes(),
                              (output / 'gui/achievements/popup.gui').read_bytes())
 

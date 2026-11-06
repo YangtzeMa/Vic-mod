@@ -34,7 +34,7 @@ BUTTON = '''
 '''
 
 
-def build(game: Path, output: Path):
+def build(game: Path, output: Path, public=False):
     groups = read_order(game)
     table = fingerprint(groups)
     source = (game / 'gui/achievements/jomini_achievements_types.gui').read_text('utf-8-sig')
@@ -74,8 +74,8 @@ def build(game: Path, output: Path):
               '|groups=[GetVariableSystem.Get(\'vicmod_click_groups\')]|group=[GetVariableSystem.Get(\'vicmod_click_group\')]'
               '|row=[GetVariableSystem.Get(\'vicmod_click_row\')]|count=[GetVariableSystem.Get(\'vicmod_click_count\')]"\n')
     write('.metadata/metadata.json', json.dumps({
-        'name': 'Vic Mod Memory - Capture Probe',
-        'id': 'com.github.YangtzeMa.Vic-mod.capture-probe',
+        'name': 'Vicmod Achievement Memory' if public else 'Vic Mod Memory - Capture Probe',
+        'id': 'com.github.YangtzeMa.Vic-mod' if public else 'com.github.YangtzeMa.Vic-mod.capture-probe',
         'version': '0.0.6', 'game_id': 'victoria3',
         'supported_game_version': '1.15.*',
         'short_description': 'Native list identity probe; All filter only; no OCR, no automatic record writes.',

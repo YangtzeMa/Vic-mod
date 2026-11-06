@@ -82,27 +82,28 @@ def consume(path: Path, lines, catalog):
 
 def remember_clicks(path: Path, lines, groups):
     """Persist only identity packets accepted by the verified-coordinate parser."""
-    from identity import PREFIX, resolve_click
+    from identity import PREFIX, BULK_PREFIX, resolve_click, resolve_bulk
     data = read_records(path)
     added, rejected = [], []
     for line in lines:
-        if PREFIX not in line:
+        if PREFIX not in line and BULK_PREFIX not in line:
             continue
         try:
-            click = resolve_click(line, groups)
+            clicks = resolve_bulk(line, groups) if BULK_PREFIX in line else [resolve_click(line, groups)]
         except ValueError as error:
             message = 'identity:' + str(error)
             rejected.append(message)
             if message not in data['unresolved']:
                 data['unresolved'].append(message)
             continue
-        key = click['id']
-        if key not in data['completed']:
-            data['completed'][key] = {
-                'observed_at': datetime.now(timezone.utc).isoformat(),
-                'source': 'native_achievement_button', 'title': key,
-            }
-            added.append(key)
+        for click in clicks:
+            key = click['id']
+            if key not in data['completed']:
+                data['completed'][key] = {
+                    'observed_at': datetime.now(timezone.utc).isoformat(),
+                    'source': 'native_achievement_bulk' if BULK_PREFIX in line else 'native_achievement_button', 'title': key,
+                }
+                added.append(key)
     if added or data != read_records(path):
         save_records(path, data)
     return data, {'added': added, 'rejected': rejected}
